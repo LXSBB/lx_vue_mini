@@ -6,7 +6,13 @@ export const App = {
         window.self = this
         return h("div", {
             id: "root",
-            class:['red', 'hard']
+            class:['red', 'hard'],
+            onClick() {
+                console.log('click')
+            },
+            onMousedown() {
+                console.log('mouseDown')
+            }
         },
             this.msg
         // [
@@ -21,4 +27,3 @@ export const App = {
         }
     }
 }
-console.log(App, 'App')
