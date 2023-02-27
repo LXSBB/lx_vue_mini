@@ -1,0 +1,27 @@
+{
+  "name": "vue-min-lx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/mini-vue.cjs.js",
+  "module": "lib/mini-vue.esm.js",
+  "scripts": {
+    "test": "jest",
+    "build": "rollup -c rollup.config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.4",
+    "@babel/preset-typescript": "^7.15.0",
+    "@rollup/plugin-typescript": "^8.2.5",
+    "@types/jest": "^27.0.1",
+    "babel-jest": "^27.1.0",
+    "jest": "^27.1.0",
+    "rollup": "^2.57.0",
+    "tslib": "^2.5.0",
+    "typescript": "^4.4.2"
+  },
+  "dependencies": {}
+}
