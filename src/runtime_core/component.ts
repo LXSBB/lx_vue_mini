@@ -1,21 +1,27 @@
 import {PublicInstanceProxyHandler} from "./componentPublicInstance";
 import {initProps} from "./componentProps";
 import {shallowReadonly} from "../reactivity/reactive";
+import {emit} from "./componentEmit";
+import {initSlot} from "./componentSlots";
 
 export function createComponentInstance(vnode) {
     const component = {
         vnode,
         type: vnode.type,
         setupState: {},
-        props: {}
+        props: {},
+        slots: {},
+        emit: () => {}
     }
+    component.emit = (emit as any).bind(null, component)
     return component
 }
 
 export function setupComponent(instance) {
     //处理组件虚拟节点的props
     initProps(instance, instance.vnode.props)
-    //initSlot()
+    // 初始化组件插槽
+    initSlot(instance, instance.vnode.children)
     setupStatefulComponent(instance)
 }
 
@@ -28,7 +34,9 @@ function setupStatefulComponent(instance) {
     if (setup) {
         //获取setup返回值
         //给setup传入props参数,因为只有props外层是响应式,所以包裹shallowReadonly
-        const setupResult = setup(shallowReadonly(instance.props))
+        const setupResult = setup(shallowReadonly(instance.props), {
+            emit: instance.emit
+        })
         handleSetupResult(instance, setupResult)
     }
 }
