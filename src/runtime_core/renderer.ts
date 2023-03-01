@@ -1,5 +1,4 @@
 import {createComponentInstance, setupComponent} from "./component";
-import { isObject } from "../shared";
 import {ShapeFlags} from "../shared/ShapeFlags";
 
 export function render(vnode, container) {
@@ -73,6 +72,7 @@ function mountChildren(vnode, container) {
 function setupRenderEffect(instance, initialVnode, container) {
     //取出组件vnode的setup代理对象
     const { proxy } = instance
+    //将render的this指向proxy
     const subTree = instance.render.call(proxy)
     patch(subTree, container)
     //将element的el赋值给组件vnode

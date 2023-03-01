@@ -1,4 +1,5 @@
-import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from "./basehandlers";
+// @ts-ignore
+import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from './basehandlers';
 import { track, trigger } from "./effect";
 
 export const enum ReactiveFlags {

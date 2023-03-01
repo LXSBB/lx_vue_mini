@@ -1,3 +1,4 @@
+// @ts-ignore
 import { hasChange, isObject } from "../shared";
 import { isTracking, trackEffects, triggerEffects } from "./effect";
 import { reactive } from "./reactive";
