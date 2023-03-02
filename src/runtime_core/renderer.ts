@@ -1,5 +1,6 @@
 import {createComponentInstance, setupComponent} from "./component";
 import {ShapeFlags} from "../shared/ShapeFlags";
+import {Fragment} from "./vnode";
 
 export function render(vnode, container) {
     //处理虚拟节点
@@ -7,16 +8,22 @@ export function render(vnode, container) {
 }
 
 function patch(vnode, container) {
-    let { shapeFlag } = vnode
-    //判断虚拟节点时element还是component
-    if (shapeFlag & ShapeFlags.ELEMENT) {
-        //处理element
-        processElement(vnode, container)
-    } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-        //处理组件
-        processComponent(vnode, container)
+    let { type, shapeFlag } = vnode
+    switch (type) {
+        //Fragment -> 只渲染children(slot)
+        case Fragment:
+            processFragment(vnode, container)
+            break
+        default:
+            //判断虚拟节点时element还是component
+            if (shapeFlag & ShapeFlags.ELEMENT) {
+                //处理element
+                processElement(vnode, container)
+            } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+                //处理组件
+                processComponent(vnode, container)
+            }
     }
-
 }
 
 function processComponent(vnode: any, container: any) {
@@ -27,6 +34,9 @@ function processElement(vnode: any, container: any) {
     mountElement(vnode, container)
 }
 
+function processFragment(vnode: any, container: any) {
+    mountChildren(vnode, container)
+}
 
 function mountComponent(initialVnode: any, container) {
     const instance = createComponentInstance(initialVnode)
