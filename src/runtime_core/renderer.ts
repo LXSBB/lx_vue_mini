@@ -1,6 +1,6 @@
 import {createComponentInstance, setupComponent} from "./component";
 import {ShapeFlags} from "../shared/ShapeFlags";
-import {Fragment} from "./vnode";
+import {Fragment, Text} from "./vnode";
 
 export function render(vnode, container) {
     //处理虚拟节点
@@ -13,6 +13,9 @@ function patch(vnode, container) {
         //Fragment -> 只渲染children(slot)
         case Fragment:
             processFragment(vnode, container)
+            break
+        case Text:
+            processText(vnode, container)
             break
         default:
             //判断虚拟节点时element还是component
@@ -36,6 +39,12 @@ function processElement(vnode: any, container: any) {
 
 function processFragment(vnode: any, container: any) {
     mountChildren(vnode, container)
+}
+
+function processText(vnode: any, container: any) {
+    const {children} = vnode
+    const textNode = vnode.el = document.createTextNode(children)
+    container.append(textNode)
 }
 
 function mountComponent(initialVnode: any, container) {

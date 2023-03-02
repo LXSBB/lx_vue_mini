@@ -1,4 +1,4 @@
-import { h } from "../../lib/mini-vue.esm.js";
+import { h, createTextVNode } from "../../lib/mini-vue.esm.js";
 import {Foo} from "./Foo.js";
 
 window.self = null
@@ -6,7 +6,10 @@ export const App = {
     render() {
         window.self = this
         //作用域插槽
-        const h1 = ({a}) => h('div', {}, 'header' + a)
+        const h1 = ({a}) => [
+            h('div', {}, 'header' + a),
+            createTextVNode('hi,bo')
+        ]
         //具名插槽
         const h2 = () => h('div', {}, 'footer1')
         const foo = h(Foo,
