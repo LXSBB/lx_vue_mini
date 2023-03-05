@@ -6,7 +6,12 @@ import {effect} from "../reactivity/effect";
 import {EMPTY_OBJ} from "../shared";
 
 export function createRenderer(options) {
-    const { createElement, patchProp: hostPatchProp, insert } = options
+    const { createElement,
+        patchProp: hostPatchProp,
+        insert,
+        remove: hostRemove,
+        setElementText: hostSetElementText
+    } = options
 
     function render(vnode, container) {
         //处理虚拟根节点
@@ -52,12 +57,12 @@ export function createRenderer(options) {
             mountElement(n2, container, parentComponent)
         } else {
             //update
-            patchElement(n1, n2, container)
+            patchElement(n1, n2, container, parentComponent)
         }
     }
 
     function processFragment(n1, n2, container: any, parentComponent) {
-        mountChildren(n2, container, parentComponent)
+        mountChildren(n2.children, container, parentComponent)
     }
 
     function processText(n1, n2, container: any) {
@@ -85,7 +90,7 @@ export function createRenderer(options) {
             el.textContent = children
         } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN){
             //如果是数组继续用patch转换
-            mountChildren(vnode, el, parentComponent)
+            mountChildren(vnode.children, el, parentComponent)
         }
         for(const key in props) {
             const val = props[key]
@@ -97,13 +102,14 @@ export function createRenderer(options) {
     }
 
     //更新element
-    function patchElement(n1, n2, container) {
+    function patchElement(n1, n2, container, parentComponent) {
         console.log(n1, n2)
         const oldProps = n1.props || EMPTY_OBJ
         const newProps = n2.props || EMPTY_OBJ
         //只有在mount时会创建el,所以得把el传承给新数据
         const el = (n2.el = n1.el)
         patchProps(el, oldProps, newProps)
+        patchChildren(n1, n2, el, parentComponent)
     }
 
     //对比props 进行更新
@@ -128,11 +134,51 @@ export function createRenderer(options) {
         }
     }
 
-    function mountChildren(vnode, container, parentComponent) {
-        vnode.children.forEach(v => {
+  /**
+   * 更新对比子节点
+   * @param n1 旧节点
+   * @param n2 新节点
+   * @param container 父节点el
+   * @param parentComponent 父节点数据
+   * */
+    function patchChildren(n1, n2, container, parentComponent) {
+        const prevShapeFlag = n1.shapeFlag
+        const {shapeFlag} = n2
+        const c2 = n2.children
+        const c1 = n1.children
+        if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+            //new : text
+            if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+                //array => text
+                //先把旧数据中的children清空,再设置text
+                unmountChildren(n1.children)
+            }
+            if (c1 !== c2) {
+                hostSetElementText(container, c2)
+            }
+        } else {
+            //new : array
+            if (prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+                // text => array
+                hostSetElementText(container, '')
+                mountChildren(c2, container, parentComponent)
+            }
+        }
+    }
+
+    //删除子节点
+    function unmountChildren(children) {
+        for (let i = 0; i < children.length; i++) {
+            hostRemove(children[i].el)
+        }
+    }
+
+    function mountChildren(children, container, parentComponent) {
+        children.forEach(v => {
             patch(null, v, container, parentComponent)
         })
     }
+
     function setupRenderEffect(instance, initialVnode, container) {
         //使响应式对象发生改变时,自动调用
         effect(() => {
