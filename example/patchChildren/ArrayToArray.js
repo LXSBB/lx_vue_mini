@@ -3,16 +3,30 @@ import {h, ref} from "../../lib/mini-vue.esm.js";
 //左侧对比
 // (a b) c
 // (a b) d e
+// const prevChildren = [
+//     h('div', {key: 'A'}, 'A'),
+//     h('div', {key: 'B'}, 'B'),
+//     h('div', {key: 'C'}, 'C'),
+// ]
+// const nextChildren = [
+//     h('div', {key: 'A'}, 'A'),
+//     h('div', {key: 'B'}, 'B'),
+//     h('div', {key: 'D'}, 'D'),
+//     h('div', {key: 'E'}, 'E'),
+// ]
+//右侧对比
+//   a (b c)
+// d e (b c)
 const prevChildren = [
     h('div', {key: 'A'}, 'A'),
     h('div', {key: 'B'}, 'B'),
     h('div', {key: 'C'}, 'C'),
 ]
 const nextChildren = [
-    h('div', {key: 'A'}, 'A'),
+    h('div', {key: 'D'}, 'D'),
+    h('div', {key: 'E'}, 'E'),
     h('div', {key: 'B'}, 'B'),
-    h('div', {key: 'D'}, 'D'),
-    h('div', {key: 'D'}, 'D'),
+    h('div', {key: 'C'}, 'C'),
 ]
 
 
