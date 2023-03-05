@@ -3,9 +3,10 @@ import {ShapeFlags} from "../shared/ShapeFlags";
 import {Fragment, Text} from "./vnode";
 import {createAppAPI} from "./createApp";
 import {effect} from "../reactivity/effect";
+import {EMPTY_OBJ} from "../shared";
 
 export function createRenderer(options) {
-    const { createElement, patchProp, insert } = options
+    const { createElement, patchProp: hostPatchProp, insert } = options
 
     function render(vnode, container) {
         //处理虚拟根节点
@@ -77,7 +78,7 @@ export function createRenderer(options) {
     * */
     function mountElement(vnode, container, parentComponent) {
         //将dom元素存储再虚拟节点上
-        const el = vnode.el = createElement(vnode.type)
+        const el = (vnode.el = createElement(vnode.type))
         const { children, props, shapeFlag } = vnode
         //判断子节点类型
         if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
@@ -89,7 +90,7 @@ export function createRenderer(options) {
         for(const key in props) {
             const val = props[key]
             //统一处理属性
-            patchProp(el, key, val)
+            hostPatchProp(el, key, null, val)
         }
         //统一append
         insert(el, container)
@@ -98,6 +99,33 @@ export function createRenderer(options) {
     //更新element
     function patchElement(n1, n2, container) {
         console.log(n1, n2)
+        const oldProps = n1.props || EMPTY_OBJ
+        const newProps = n2.props || EMPTY_OBJ
+        //只有在mount时会创建el,所以得把el传承给新数据
+        const el = (n2.el = n1.el)
+        patchProps(el, oldProps, newProps)
+    }
+
+    //对比props 进行更新
+    function patchProps(el, oldProps, newProps) {
+        if (oldProps !== newProps) {
+            for (const key in newProps) {
+                const prevProp = oldProps[key]
+                const nextProp = newProps[key]
+                //数值不同 更新
+                if (prevProp !== nextProp) {
+                    hostPatchProp(el, key, prevProp, nextProp)
+                }
+            }
+            if (oldProps !== EMPTY_OBJ) {
+                //当新的对象中没有旧对象的值,则需删除
+                for (const key in oldProps) {
+                    if (!(key in newProps)) {
+                        hostPatchProp(el, key, oldProps[key], null)
+                    }
+                }
+            }
+        }
     }
 
     function mountChildren(vnode, container, parentComponent) {
@@ -113,9 +141,8 @@ export function createRenderer(options) {
                 //取出组件vnode的setup代理对象
                 const { proxy } = instance
                 //将数据储存
-                instance.subTree = instance.render.call(proxy)
                 //将render的this指向proxy
-                const subTree = instance.render.call(proxy)
+                const subTree = (instance.subTree =  instance.render.call(proxy))
                 patch(null, subTree, container, instance)
                 //将element的el赋值给组件vnode
                 initialVnode.el = subTree.el

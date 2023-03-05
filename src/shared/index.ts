@@ -22,3 +22,5 @@ export function camelize(str) {
         return c?c.toUpperCase():''
     })
 }
+export const EMPTY_OBJ = {}
+
