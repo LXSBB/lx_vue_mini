@@ -2,10 +2,12 @@ import {createRenderer} from "../runtime_core";
 // @ts-ignore
 export * from '../runtime_core'
 
+//创建元素
 function createElement(type) {
  return document.createElement(type)
 }
 
+//更新属性
 function patchProp(el, key, prevVal, nextVal) {
     //判断属性是否是个事件
     const isOn = (key) => /^on[A-Z]/.test(key)
@@ -22,11 +24,13 @@ function patchProp(el, key, prevVal, nextVal) {
     }
 }
 
-function insert(el, container) {
-    container.append(el)
+//注入元素
+function insert(child, parent, anchor) {
+    //插入描点anchor的上一位
+    parent.insertBefore(child, anchor || null)
 }
 
-//删除子节点
+//删除元素
 function remove(child) {
     const parent = child.parentNode
     if (parent) {
@@ -34,7 +38,7 @@ function remove(child) {
     }
 }
 
-//设置子节点为text
+//设置子节点为text元素
 function setElementText(el, text) {
     el.textContent = text
 }
