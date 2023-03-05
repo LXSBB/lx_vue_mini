@@ -162,8 +162,44 @@ export function createRenderer(options) {
                 // text => array
                 hostSetElementText(container, '')
                 mountChildren(c2, container, parentComponent)
+            } else {
+                // array => array
+                patchKeyedChildren(c1, c2, container, parentComponent)
             }
         }
+    }
+
+    /**
+     * 双端对比子节点
+     * @param c1 旧节点
+     * @param c2 新节点
+     * @param container
+     * @param parentComponent
+     * */
+    function patchKeyedChildren(c1, c2, container, parentComponent) {
+        // e1 : 旧数组的右侧指针
+        let e1 = c1.length - 1
+        // i : 新数组的左侧指针
+        let i = 0
+        // e2 : 新数组的右侧指针
+        let e2 = c2.length - 1
+
+        while (i <= e1 && 1 <= e2) {
+            const n1 = c1[i]
+            const n2 = c2[i]
+            if (isSomeVNodeType(n1, n2)) {
+                patch(n1, n2, container, parentComponent)
+            } else {
+                //节点不一致时
+               break
+            }
+            i++
+        }
+        console.log(i, '================>')
+    }
+
+    function isSomeVNodeType(n1, n2) {
+        return n1.type === n2.type && n1.key === n2.key
     }
 
     //删除子节点

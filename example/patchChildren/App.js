@@ -2,6 +2,7 @@ import { h } from "../../lib/mini-vue.esm.js";
 import {ArrayToText} from "./ArrayToText.js";
 import {TextToText} from "./TextToText.js";
 import {TextToArray} from "./TextToArray.js";
+import {ArrayToArray} from "./ArrayToArray.js";
 
 window.self = null
 export const App = {
@@ -14,7 +15,8 @@ export const App = {
             h("p", {class:"red"},'主页'),
             //h(ArrayToText)
             //h(TextToText)
-            h(TextToArray)
+            //h(TextToArray)
+            h(ArrayToArray)
         ]
     )
     },
